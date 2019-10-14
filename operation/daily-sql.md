@@ -1,3 +1,61 @@
+## 金鹏需要的和平的数据
+select AA.uid, CC.allAmount
+from
+    (
+        select DD.uid, DD.room_id
+        from (
+            select A.uid, A.room_id, row_number() over (partition by A.uid order by A.view_time desc  ) num
+            from (
+                select uid, room_id, sum(view_live_time) as view_time
+                from oss_bi_tag_of_view_live_time_by_roomid
+                where pt_day >= '2019-10-01' and uid > 0 group by uid, room_id
+            ) A
+        ) DD
+        where DD.num = 1
+    ) AA
+inner join
+    (select * from oss_bi_all_anchor_gameid_camp where pt_day = '2019-10-11' and game_id = 1576) BB
+    on AA.room_id = BB.room_id
+left join
+    (select uid, sum(amount) as allAmount from oss_bi_all_chushou_pay_info where pt_day >= '2019-09-01' and state = 0 group by uid) CC
+    on AA.uid = CC.uid
+
+
+## 游戏视频播放回调视频id拉取
+select get_json_object(request_parms['value'],'$.videoId') as videoId, request_parms['_appVersion'], IF(request_parms['token'] != '', split(request_parms['token'],'g')[1], '') as uid16
+from oss_bi_all_appstat_feedback_action_log
+where pt_day = '2019-10-10' and request_parms['type'] = 17 and request_parms['_appkey'] = 'CSAndroid' and get_json_object(request_parms['value'],'$._fromView') = 11;
+
+
+## 陪玩玩主的数据要求
+select gamemate_uid, sum(count) as num from gamemate_order where state = 3 group by gamemate_uid having num >= 100 order by num desc
+
+## 查询今日房间数量
+select
+    A.dt,
+    count(distinct a.identify)
+from (
+    select substr(date_time, 1, 16) as dt, parms['identify'] as identify
+    from oss_bi_all_jellyfish_log
+    where pt_day = '2019-09-07' and log_type = 2 and parms['appkey'] = 'CSWeb') A
+group by A.dt order by A.dt asc
+
+
+select count(1)
+from oss_bi_all_jellyfish_log
+where pt_day = '2019-09-06' and log_type = 2 and parms['appkey'] = 'CSWeb'
+
+select A.room_id, A.num from (
+select parms['roomId'] as room_id, count(1) as num
+from oss_bi_all_jellyfish_log
+where pt_day = '2019-09-06' and substr(date_time, 1, 16) = '2019-09-06 21:51' and log_type = 2 and parms['appkey'] = 'CSWeb' group by parms['roomId']
+) A order by A.num desc limit 100;
+
+
+select count(distinct parms['uid']), count(distinct parms['ip'])
+from oss_bi_all_jellyfish_log
+where pt_day = '2019-09-06' and log_type = 2 and substr(date_time, 1, 16) = '2019-09-06 21:51' and parms['roomId'] = 29752482 and parms['appkey'] = 'CSWeb'
+
 ## 查询金鹏需要的数据
 select game_id,	sum(total_people_count),	sum(total_receive_gift_count),	sum(total_active_audience_count),	sum(total_pay_uid),	sum(total_pay_amount) from room_live_data_record where date_time = '2019-10' group by game_id;
 
