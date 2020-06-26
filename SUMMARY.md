@@ -1,3 +1,3 @@
 # SUMMARY
 
-* [介绍](README.md)
+* [自我介绍](README.md)
