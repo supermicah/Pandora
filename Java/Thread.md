@@ -16,6 +16,8 @@
 ## 状态`Thread.State`
 > 一个线程在指定的时刻上，只能存在一个状态；JVM的线程状态和操作系统的线程状态不是一一对应的。了解线程状态可用于分析线程问题/监控，不建议通过判断线程状态来进行逻辑处理
 
+![跟传统进（线）程状态划分的一个最终对比](assets/Thread-20b08934.png)
+
 * `NEW` (新建)       
 > 一个尚未启动的线程处于这一状态。(A thread that has not yet started is in this state.)
 
@@ -52,3 +54,9 @@ t.start();
 > 一个已经退出的线程处于这一状态。(A thread that has exited is in this state.)
 
 已经退出的线程处于这一状态
+
+## 操作
+
+
+## 其他
+线程优先级别
