@@ -5,8 +5,8 @@
 当然，这里要感谢C总的指导
 
 以下是近期的目标
-1. Java基础
-2. Redis
-3. MySQL
-4. Springboot
-5. Dubble
+* Java基础
+* Redis
+* MySQL
+* Springboot
+* Dubble
