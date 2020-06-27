@@ -13,12 +13,13 @@
 4. 多线程优缺点
 > JVM支持多线程，正确使用多线程能大大提高程序的服务能力，同时也引入程序的复杂度和线程安全问题(不正确使用)。
 
-## 状态
+## 状态`Thread.State`
 > 一个线程在指定的时刻上，只能存在一个状态；JVM的线程状态和操作系统的线程状态不是一一对应的。了解线程状态可用于分析线程问题/监控，不建议通过判断线程状态来进行逻辑处理
 
 * `NEW` (新建)       
 > 一个尚未启动的线程处于这一状态。(A thread that has not yet started is in this state.)
 
+尚未启动的线程处于这一状态，即尚未调用start()
 ```Java
 Theard t = new Theard();
 ```
@@ -26,14 +27,28 @@ Theard t = new Theard();
 * `RUNNABLE` (可运行)       
 > 一个正在 Java 虚拟机中执行的线程处于这一状态。(A thread executing in the Java virtual machine is in this state.)
 
+JVM中可执行的线程处于这一状态
+```Java
+Theard t = new Theard();
+t.start();
+```
+
 * `BLOCKED` (阻塞)       
 > 一个正在阻塞等待一个监视器锁的线程处于这一状态。(A thread that is blocked waiting for a monitor lock is in this state.)
+
+线程等待监视器锁时处于这一状态，如 synchronized，通俗理解：当因为获取不到锁而无法进入同步块时，线程处于 BLOCKED 状态。
 
 * `WAITING` (等待)       
 > 一个正在无限期等待另一个线程执行一个特别的动作的线程处于这一状态。(A thread that is waiting indefinitely for another thread to perform a particular action is in this state.)
 
+正在无限期等待另一个线程执行一个特别的动作的线程处于这一状态，如 `Object.wait()`、`Thread.join()`、`LockSupport.park()`。特别动作分别为：`notify/notifyAll`、线程完结、、`LockSupport.unpark()`
+
 * `TIMED_WAITING` (计时等待)       
 > 一个正在限时等待另一个线程执行一个动作的线程处于这一状态。(A thread that is waiting for another thread to perform an action for up to a specified waiting time is in this state.)
 
+限时等待另一个线程执行一个动作的线程处于这一状态，如：`Thread.sleep(long millis)`、`Object.wait(long millis`，`Object.wait(long millis)`、`Thread.join(long millis)`、`LockSupport.parkNanos(Object blocker, long nanos) `、 `LockSupport.parkUntil(Object blocker, long nanos)`
+
 * `TERMINATED` (终止)       
 > 一个已经退出的线程处于这一状态。(A thread that has exited is in this state.)
+
+已经退出的线程处于这一状态
