@@ -18,6 +18,7 @@
 
 * `NEW` (新建)       
 > 一个尚未启动的线程处于这一状态。(A thread that has not yet started is in this state.)
+
 ```Java
 Theard t = new Theard();
 ```
