@@ -1,5 +1,18 @@
 # 线程
 
+## 概念
+1. Java线程是什么  
+> 描述：Java的线程，是运行在JVM的程序上的基本执行单元， Java针对线程抽象出Thread对象的概念。
+
+2. Java线程分类
+> Thread分为守护线程和非守护线程，当JVM启动时，伴随一个非守护线程的运行，我们称之为主线程/main函数，当JVM所有的非守护线程都销毁时，JVM实例也会销毁；
+
+3. Java线程生命周期
+> Java线程包含6个状态：NEW，RUNNABLE，BLOCKED，WAITING，TIMED_WAITING，TERMINATED
+
+4. 多线程优缺点
+> JVM支持多线程，正确使用多线程能大大提高程序的服务能力，同时也引入程序的复杂度和线程安全问题(不正确使用)。
+
 ## 状态
 * `NEW` (新建)       
 一个尚未启动的线程处于这一状态。(A thread that has not yet started is in this state.)
