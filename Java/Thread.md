@@ -55,8 +55,59 @@ t.start();
 
 已经退出的线程处于这一状态
 
-## 操作
+## 方法
+* 常用新建线程
+```Java
+// 1. 默认新建
+Thread t1 = new Thread();
+
+// 2. 传入runnable方法
+Thread t2 = new Thread(new Runnable() {
+	public void run() {
+		synchronized (xxx) {
+			// todo
+		}
+	}
+});
+
+// 3. 传入默认名称
+Thread t3 = new Thread("thread-name");
+
+// 还有些是其他方法，详细Thread类
+
+```
+
+* 线程开始
+```Java
+/**
+ * Causes this thread to begin execution; the Java Virtual Machine calls the run method of this thread.
+ */
+start();
+```
+该方法代码实现是调用 `start0();` 方法，但实际上是调用Thread中的 `run()` 方法；
+
+* 退出（内部方法）
+```Java
+/**
+ * This method is called by the system to give a Thread
+ * a chance to clean up before it actually exits.
+ */
+exit();
+```
+
+```Java
+/**
+ * 只是在当前线程中打了一个停止的标记，并不是直接将线程停止
+ */
+interrupt();
+```
+
+
 
 
 ## 其他
 线程优先级别
+
+
+## 资料索引
+1. [国栋的osChina](https://my.oschina.net/goldenshaw?tab=newest&catalogId=3277710)
