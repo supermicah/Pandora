@@ -57,6 +57,7 @@ t.start();
 
 ## 方法
 * 常用新建线程
+
 ```Java
 // 1. 默认新建
 Thread t1 = new Thread();
@@ -78,6 +79,7 @@ Thread t3 = new Thread("thread-name");
 ```
 
 * 线程开始
+
 ```Java
 /**
  * Causes this thread to begin execution; the Java Virtual Machine calls the run method of this thread.
@@ -87,6 +89,7 @@ start();
 该方法代码实现是调用 `start0();` 方法，但实际上是调用Thread中的 `run()` 方法；
 
 * 退出（内部方法）
+
 ```Java
 /**
  * This method is called by the system to give a Thread
