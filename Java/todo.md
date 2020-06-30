@@ -202,7 +202,7 @@ ScheduledThreadPoolExecutor extends ThreadPoolExecutor implements ScheduledExecu
   5-3-1、优点：RDB文件紧凑，恢复数据相对AOF更快（文件更小），适合数据备份，传输；缺点：BGSAVE耗时较长，安全性比不上AOF（耗时 = 恢复数据的时间）
 
   5-3-2、优点：AOF数据更完整，安全性更高（取决于 appendsync），可能解决误命令的恢复； 缺点：AOF文件大于RDB，恢复较RDB慢
-  
+
 6、Maxmemory policy：Reids服务器内存随着数据增加，到达maxmemory时，会触发 Maxmemory policy 进行数据淘汰（驱逐）
 
  6-1、volatile-lru：从过期集中删除最久没被访问的一个key（remove the key with an expire set using an LRU algorithm）
@@ -218,3 +218,47 @@ ScheduledThreadPoolExecutor extends ThreadPoolExecutor implements ScheduledExecu
  6-6、noeviction：默认选项，不做任何操作，直接访问写操作失败(don't expire at all, just return an error on write operations)
 
  6-7、LRU，最小TTL 算法只是一个非精准的算法（Redis数据量较大）；Redis通过 maxmemory-samples 设置取样的个数，默认5，也就是说lru和ttl是基于指定个数下的数据进行淘汰，所以不是一个精确的淘汰机制
+
+
+
+
+ RPC，RPC服务是基于接口（函数）的调用
+
+RPC服务端
+
+ 1、初始化阶段，加载提供RPC服务的Spring Bean，通过Map<MethodName, Method> 的方式存储在内存中，供客户端请求
+
+  1-1、Spring扫描服务端指定规则下的类，得到对应的Class 列表
+
+  1-2、遍历Class列表，通过 applaction.getBean(Class clz) 拿到当前Class的实例，也就是提供RPC接口的实例 Object object。
+
+  1-3、RPC接口实例 对应一个 RpcServiceDepiction，初始化近包含前三步骤
+
+   1-3-1、属性 target,
+
+   1-3-2、所有可执行方法映射：Map<MethodUniqueName, Method> methodMap，key为字符串，方法的权限定名称（包含参数类型列表）
+
+   1-3-3、提供 target 对应的接口列表，一般只有一层接口
+
+   1-3-4、提供Object execute(String methodUniqueName, Object[] arguments)，根据methodMap和target触发 method.invoke(target, arguments)，并且返回
+
+  1-4、根据RpcServiceDepiction，服务端本地存放Map<RpcInterfaceName, RpcServiceDepiction> 供调用
+
+  1-5、启动ServerSocket，独立线程 accpect()，采用BIO模式进行客户端的连接监听
+
+
+ 2、调用过程
+
+  2-1、RPC服务端的 accpect() 监听到（RPC客户端）连接，生成对应的 RpcChannel 实例，具体说明如下
+
+   2-1-1、独立的Read线程，通过 socket.read(byte[] buff) 进行阻塞式接收客户端数据，接收到的字节数组，调用decode，得到对应的 Packet，支持业务、心跳类型，并且回响应包
+
+   2-1-2、当前Packet为业务数据包，连同Channel 一起包装成任务提交到线程池中，采用的是SynchronizedQueue，上限500的线程数，如果触发线程池的Reject操作，返回too busy 业务包
+
+   2-1-3、提供Send(Packet packet)，将send的packet put到BlockingQueue中；
+
+   2-1-4、独立的Write线程，不停的从队列task数据，进行数据发送，这里有合包处理
+
+  2-2、任务会将消息包Packet decode 成请求消息 RpcRequestMessage 实例，结构如下：
+
+   2-2-1、String targetClass, RPC接口类的名称，如 com.xxx.xxx.xxxRemoteService，可用来映射得到 RpcServiceDepiction
