@@ -166,3 +166,55 @@ ScheduledThreadPoolExecutor extends ThreadPoolExecutor implements ScheduledExecu
 
 
 疑问：阻塞，非阻塞；同步，异步；
+
+5、持久化
+
+ 5-1、RDB(Redis database)，将数据库的所有数据（状态）保存为RDB文件，通过SAVE（同步），BGSAVE（fork出子进程，异步）命令触发；执行BGSAVE期间，将拒绝执行新的SAVE，BGSAVE命令；
+
+  5-1-1、通过SaveParams，设置BGSAVE的触发规则，如save 900 1表示在900s内，至少有一次修改。Redis会保存 dirty(修改次数)、lastsave(上一次save操作时间)，对比SaveParams条件，符合则触发BGSAVE
+
+  5-1-2、加载RDB文件不需要输入命令，Redis服务启动时，如果配置没开启AOF，会自动扫描是否存在 RDB 文件，存在则加载，加载操作为同步.
+
+  5-1-3、生成RDB文件过程中，如果数据已过期，该数据将不会进入RDB文件。加载RDB文件过程中，发现有数据已过期，则会被丢弃
+
+ 5-2、AOF(Append only file)，Redis的另一个持久化方式，通过保存Redis服务器所执行的命令来记录数据库状态。
+
+  5-2-1、命令追加：数据的更新命令，会append到AOF的buffer尾部。
+
+  5-2-2、AOF的写入和同步，配置appendsync：flushAppendOnlyFile()函数调用时，根据 appendsync 进行文件写入(文件Buffer) 和 同步(Buffer数据导入文件)
+
+    always：每次都会触发AOF文件的写入，并且触发文件同步. 安全性最高，但性能最差
+
+    no：每次都会触发AOF文件写入，但文件同步有系统决定，不受控制. 性能最好，安全性不可预估，因为不知道系统什么时候发起文件同步
+
+    everysec(默认选项)：与上一次AOF文件写入间隔如果超过1s，则写入 + 同步. 折中安全性和性能，出现宕机最多丢失1s的数据
+
+    注：IO流，在操作系统上都会基于buffer的方式进行数据操作，写文件可以理解为只是写入缓冲区，flush(系统底层指令为fsync/fdatasync)会将缓冲区数据刷到目标源
+
+  5-2-3、服务器载入AOF文件，启动本地的虚拟RedisClient，一个一个的命令执行，直到执行完所有命令
+
+  5-2-4、Rewrite：随着运行时间推移，服务器执行的命令累计，AOF文件膨胀，为了解决这个问题，Redis提供了AOF rewrite 功能，将数据库的数据通过命令写入到新的AOF文件中，也有对应的BGRwriteAOF
+
+  5-2-5、BGRewrite过程中，主进程会有增量的数据；Redis在启动Rewrite时，新增AOFRewrite缓冲区，用来存放增量命令，rewrite完成之后，将增量数据同步到rewrite文件，之后替换原AOF文件
+
+ 5-3、RDB vs AOF
+
+  5-3-1、优点：RDB文件紧凑，恢复数据相对AOF更快（文件更小），适合数据备份，传输；缺点：BGSAVE耗时较长，安全性比不上AOF（耗时 = 恢复数据的时间）
+
+  5-3-2、优点：AOF数据更完整，安全性更高（取决于 appendsync），可能解决误命令的恢复； 缺点：AOF文件大于RDB，恢复较RDB慢
+  
+6、Maxmemory policy：Reids服务器内存随着数据增加，到达maxmemory时，会触发 Maxmemory policy 进行数据淘汰（驱逐）
+
+ 6-1、volatile-lru：从过期集中删除最久没被访问的一个key（remove the key with an expire set using an LRU algorithm）
+
+ 6-2、allkeys-lru：从所有key中，删除最久没被访问的一个key（remove any key according to the LRU algorithm）
+
+ 6-3、volatile-random：从过期集中随机删除一个key（remove a random key with an expire set）
+
+ 6-4、allkeys-random：从所有key中，随机删除一个key（remove a random key, any key）
+
+ 6-5、volatile-ttl：删除最快过期的一个key(remove the key with the nearest expire time (minimal TTL))
+
+ 6-6、noeviction：默认选项，不做任何操作，直接访问写操作失败(don't expire at all, just return an error on write operations)
+
+ 6-7、LRU，最小TTL 算法只是一个非精准的算法（Redis数据量较大）；Redis通过 maxmemory-samples 设置取样的个数，默认5，也就是说lru和ttl是基于指定个数下的数据进行淘汰，所以不是一个精确的淘汰机制
