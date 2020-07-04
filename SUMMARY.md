@@ -5,3 +5,4 @@
     * [Thread](Java/Thread.md)
     * [JMM](Java/JMM.md)
     * [HashMap](Java/hashMap.md)
+    * [GC](Java/GC.md)
