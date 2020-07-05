@@ -3,8 +3,7 @@
 ## redis 安装
 > 如何安装redis及简单使用
 
-```
-
+```bash
 # 查找redis是否在库中
 brew search redis
 # 安装redis
