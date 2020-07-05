@@ -15,5 +15,7 @@
 * 二进制：可以保存任何二进制，不会因为'\0'字符而导致中断，因为redis读取数据时，使用的是len进行读取
 
 ### 链表：Link
-* 数据结构（listNode）：prev, next, value;多个listNode可以通过prev和next指针组成双端链表
+* 数据结构（list）：
+* 内部子节点数据结构：prev, next, value;多个listNode可以通过prev和next指针组成双端链表
 ![双端链表数据结构](assets/markdown-img-paste-2020070516130863.png)
+* 获取长度的复杂度O(1):
