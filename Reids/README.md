@@ -1,6 +1,8 @@
 # Redis
 
 ## redis 安装
+> 如何安装redis及简单使用
+
 ```shell
 
 # 查找redis是否在库中
