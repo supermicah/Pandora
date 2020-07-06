@@ -62,3 +62,58 @@
 ![对象对应的encoding](assets/DataStructure-1310e732.png)
 每种类型的对象都至少使用了两种不同的编码
 ![对象的type对应的encoding](assets/DataStructure-44bfbe16.png)
+* 各个对象的详解
+    * String
+        * 包含类型：
+            * int:整数值
+            * raw:字符串长度大于32
+            * embstr: 字符串长度小于等于32，如果是浮点型的数字，redis采用该类型进行保存，在浮点型进行计算时，redis会把字符串类型转换为浮点型，然后计算好，再转换为字符串进行保存
+        * 字符串类型转换：
+            * int使用`append`命令后，转换为`raw`
+            * embstr在修改后，也直接转换为`raw`
+        * 常用命令：
+            * set
+            * get
+            * append
+            * incrbyfloat
+            * incrby
+            * decrby
+            * strlen
+            * setrange
+            * getrange
+    * 列表
+        * 类型：
+            * Ziplist
+            * linkedlist
+            * quicklist
+        * 类型转换：ziplist需要满足以下两个条件：1、所有元素的字符长度都要小于64；2、所有元素个数需要小于256
+        * 常用命令：
+            * lpush
+            * rpush
+            * lpop
+            * rpop
+            * lindex
+            * llen
+            * linsert
+            * lrem
+            * ltrim
+            * lset
+    * 哈希
+        * 类型
+            * ziplist
+            * hashtable
+        * 类型转换：ziplist需要满足以下两个条件：1、保存的所有键值对的字符长度都要小于64；2、保存的键值对数量小于512
+        * 常用命令：
+            * hset
+            * hget
+            * hexists
+            * hdel
+            * hlen
+            * hgetall
+    * 集合
+        * 类型
+            * intset
+            * ht
+        * 类型转换：intset需要满足以下两个条件：1、集合对象保存的所有对象都是整数值；2、集合对象保存的元素不能超过512
+        * 常用命令：
+            * 
