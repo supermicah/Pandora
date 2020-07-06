@@ -116,4 +116,12 @@
             * ht
         * 类型转换：intset需要满足以下两个条件：1、集合对象保存的所有对象都是整数值；2、集合对象保存的元素不能超过512
         * 常用命令：
-            * 
+            * sadd
+            * scard
+            * sismember
+            * srandmember
+            * smembers
+            * spop
+            * srem
+
+    * 有序集合
