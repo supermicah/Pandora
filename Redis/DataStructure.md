@@ -54,3 +54,11 @@
 ![ziplist结构](assets/DataStructure-356a470d.png)
 * 内部子节点数据结构：previous_entry_length, encoding, content;该结构遍历的时候只能通过从后往前遍历
 * 连锁更新：需要了解连锁更新的坏处
+
+### 对象：RedisObject
+* 数据结构：type, encoding, ptr(指向底层实现数据结构的指针);
+* 对象的type属性：REDIS_STRING, REDIS_HASH, REDIS_SET, REDIS_ZSET, REDIS_LIST
+![对象的type](assets/DataStructure-b613063f.png)
+![对象对应的encoding](assets/DataStructure-1310e732.png)
+每种类型的对象都至少使用了两种不同的编码
+![对象的type对应的encoding](assets/DataStructure-44bfbe16.png)
