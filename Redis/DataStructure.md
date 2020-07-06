@@ -24,5 +24,16 @@
     * 无环：tail节点的next为NULL，head节点的prev为NULL
     * 带表头、表尾指针，获取表头表尾的复杂度为O(1)
 
-### 字典：Hash
-* 数据结构（dictht）：
+### 哈希表：Hash
+* 数据结构（dictht）：table(数组，类似于`java`中的`HashMap`), size(hash表的大小), sizemask(size - 1), used(已使用的大小);
+* 内部子节点数据结构（dictEntry）：key, value, next;
+* 扩容：没有`BGSAVE`或者`BGREWRITEAOF`负载因子大于等于1，有`BGSAVE`或者`BGREWRITEAOF`负载因子大于等于5 （负载因子= 哈希表已保存节点数量/ 哈希表大小 load_factor = ht[0].used / ht[0].size）
+* 渐进式扩容：
+
+### 字典：Dict
+* 数据结构（dict）：type（dictType）, privdata, ht[2]（hashtable）, trehashidx
+* ht属性是一个包含两个项的数组，数组中的每个项都是一个dictht哈希表，一般情况下，字典只使用ht[0]哈希表，ht[1]哈希表只会在对ht[0]哈希表进行rehash时使用
+* 计算hash的index算法`hash = dict->type->hashFunction(k0);` `index = hash&dict->ht[0].sizemask = 8 & 3 = 0;`, 当字典被用作数据库的底层实现，或者哈希键的底层实现时，Redis使用MurmurHash2算法来计算键的哈希值
+* 当hash对应的index相同时，采用link的方式用dictEntry的next指向下一个，所以为了速度考虑，程序总是将新节点添加到链表的表头位置（复杂度为O(1)）
+* rehash
+    * 扩容大小（大于等于ht[0].used*2的2n （2的n次方幂）
