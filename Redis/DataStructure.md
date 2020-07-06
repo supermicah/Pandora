@@ -37,3 +37,20 @@
 * 当hash对应的index相同时，采用link的方式用dictEntry的next指向下一个，所以为了速度考虑，程序总是将新节点添加到链表的表头位置（复杂度为O(1)）
 * rehash
     * 扩容大小（大于等于ht[0].used*2的2n （2的n次方幂）
+    * 渐进式扩容：ht[1]分配相应大小的空间；rehashidx设置为0；每次对字典执行添加、删除、查找或者更新操作时，程序除了执行指定的操作以外，还会顺带将ht[0]哈希表在rehashidx索引上的所有键值对rehash到ht[1]，当rehash工作完成之后，程序将rehashidx属性的值增1；全部完成后，将rehashidx属性的值设为-1，表示rehash操作已完成。
+
+### 跳跃表：Zskiplist
+* 数据结构（zskiplist）：header, tail, level, length
+* 内部子节点数据结构（zskiplistNode）：level[]（层级对象，最高32层）, backward（回退，类似于prev）, score（分值）, obj（对象存储内容）
+
+### 整数集合：Intset
+* 数据结构（intset）：encoding（编码方式）, length(数组长度), contents(元素内容)
+* 数据类型encoding：int16_t, int32_t, int64_t
+* 数据存储：有序的存储，小的在前面，大的在后面，所有的内容，编码相同，方便管理
+* 升级规则：如果编码需要升级，说明新增的字段，要么比所有字段大，要么比所有字段小，所以只会在最前面，或者最后面；升级后，不会存在降级可能
+
+### 压缩表：Ziplist
+* 数据结构（ziplist）：zlbytes(), zltail(), zllen(), entryN(), zlend()
+![ziplist结构](assets/DataStructure-356a470d.png)
+* 内部子节点数据结构：previous_entry_length, encoding, content;该结构遍历的时候只能通过从后往前遍历
+* 连锁更新：需要了解连锁更新的坏处
