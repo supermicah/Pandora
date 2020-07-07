@@ -125,3 +125,34 @@
             * srem
 
     * 有序集合
+        * 类型
+            * ziplist
+            * skiplist：通过zset数据结构进行封装，里面有一个zsl，一个dict，这个dict就可以使用O(1)的时间复杂度来查找元素对应的值了。
+        * 类型转换：ziplist需要满足以下两个条件：1、保存的有序集合的字符长度都要小于64；2、有序集合保存的元素数量小于128个
+        * 常用命令：
+            * zadd
+            * zcard
+            * zcount
+            * zrange
+            * zrevrange
+            * zrank
+            * zrevrank
+            * zrem
+            * zscore
+* 多态
+* 内存回收`redisObject`存在一个`refcount`
+* 共享对象:节约内存
+
+## 数据库
+
+### 数据库结构说明
+* db：默认包含了16个数据库，从下标`0`开始，一直到`16`
+* dbnum：默认16
+* 选择数据库：`select n`
+* 过期时间及删除策略、redis的删除策略、aof与rdb对过期key的处理方式不同、主从服务对于过期key的惰性删除不一致
+
+### 持久化
+* 类型：
+    * RDB
+    * AOF
+* 顺序：
