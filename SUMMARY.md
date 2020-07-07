@@ -4,7 +4,7 @@
 * [Java基础](Java/README.md)
     * [Thread](Java/Thread.md)
     * [JMM](Java/JMM.md)
-    * [HashMap](Java/hashMap.md)
+    * [HashMap](Java/HashMap.md)
     * [GC](Java/GC.md)
 * [Redis](Redis/README.md)
     * [数据结构](Redis/DataStructure.md)
