@@ -155,4 +155,4 @@
 * 类型：
     * RDB
     * AOF
-* 顺序：
+* 顺序：![持久化还原顺序](assets/markdown-img-paste-20200707101402571.png)
